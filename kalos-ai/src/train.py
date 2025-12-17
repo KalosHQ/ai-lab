@@ -1,27 +1,16 @@
 import argparse
-import time
-import torch
+from ultralytics import YOLO
 
 def train(epochs, device_name):
     print(f"Starting training on {device_name}...")
     
-    if torch.cuda.is_available():
-        if device_name == 'cuda':
-            print(f"Using GPU: {torch.cuda.get_device_name(0)}")
-        else:
-            print("CUDA available but using CPU as requested/default.")
-    else:
-        print("CUDA not available. Using CPU.")
+    # Load a model
+    model = YOLO("yolov8n.pt")  # build a new model from scratch or load pretrained
 
-    device = torch.device(device_name if torch.cuda.is_available() else "cpu")
-    print(f"Device set to: {device}")
-
-    # Simulated training loop
-    for epoch in range(1, epochs + 1):
-        print(f"Epoch {epoch}/{epochs}")
-        # Simulate work
-        time.sleep(0.5) 
-        
+    # Train the model
+    # data arg points to the yaml file in root
+    model.train(data="modanet.yaml", epochs=epochs, device=device_name)
+    
     print("Training complete.")
 
 if __name__ == "__main__":

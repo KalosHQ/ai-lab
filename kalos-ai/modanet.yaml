@@ -1,0 +1,10 @@
+path: data/modanet_yolo
+train: images/train
+val: images/val
+
+names:
+  0: top
+  1: bottom
+  2: dress
+  3: shoes
+  4: bag
