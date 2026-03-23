@@ -1,6 +1,11 @@
-ultralytics
-opencv-python
-scikit-learn
-matplotlib
 torch
 torchvision
+smplx
+fastapi
+uvicorn[standard]
+trimesh
+numpy
+python-dotenv
+pydantic
+google-generativeai
+matplotlib
