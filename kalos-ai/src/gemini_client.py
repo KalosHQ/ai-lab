@@ -26,7 +26,7 @@ class GeminiClient:
                 raise FileNotFoundError(f"Image not found at {image_path}")
 
             # Upload valid file to Gemini (or pass bytes if small, but let's stick to simple path for now)
-            # For 1.5 Flash, we can often pass the PIL image or path directly if using the File API.
+            # For 2.5 Flash, we can often pass the PIL image or path directly if using the File API.
             # Let's use the standard way: load bytes/PIL
             
             # Note: For production, we might want to use the File API for caching, 
