@@ -11,7 +11,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 
 from schemas import AvatarRequest, AvatarResponse
-from avatar.body_mapper import map_to_betas
+from avatar_generation.avatar_pipeline import generate_avatar as generate_avatar_pipeline
 
 router = APIRouter(prefix="/api/ai", tags=["avatar"])
 
@@ -19,31 +19,33 @@ router = APIRouter(prefix="/api/ai", tags=["avatar"])
 @router.post("/generate-avatar", response_model=AvatarResponse)
 async def generate_avatar(req: AvatarRequest):
     """Generate a 3D body mesh from user measurements."""
-    # Import here to access the shared instance set during lifespan
-    from api.main import generator
-
-    if generator is None:
+    # Use the unified avatar pipeline
+    filename = f"avatar_{uuid.uuid4().hex[:8]}"
+    
+    try:
+        # Call the pipeline function
+        out_path = generate_avatar_pipeline(
+            height_cm=req.height_cm,
+            weight_kg=req.weight_kg,
+            body_type=req.body_type.value,
+            gender=req.gender.value,
+            model_dir="models/smplx",
+            output_dir="output",
+            filename=filename,
+            export_format=req.export_format.value
+        )
+    except FileNotFoundError as e:
         raise HTTPException(
             status_code=503,
-            detail="SMPL-X models are not loaded. Place model files in models/smplx/ and restart.",
+            detail=f"SMPL-X models not found. Place model files in models/smplx/ and restart. Error: {str(e)}"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error generating avatar: {str(e)}"
         )
 
-    # 1. Map inputs → SMPL-X betas
-    betas = map_to_betas(
-        height_cm=req.height_cm,
-        weight_kg=req.weight_kg,
-        body_type=req.body_type.value,
-        gender=req.gender.value,
-    )
-
-    # 2. Generate mesh
-    mesh = generator.generate_mesh(betas=betas, gender=req.gender.value)
-
-    # 3. Export to file
-    filename = f"avatar_{uuid.uuid4().hex[:8]}"
-    out_path = generator.export(mesh, filename=filename, export_format=req.export_format.value)
-
-    # 4. Return the file as a download
+    # Return the file as a download
     media_type = "model/obj" if req.export_format.value == "obj" else "model/gltf+json"
     ext = req.export_format.value
 
