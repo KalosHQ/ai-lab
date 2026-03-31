@@ -15,8 +15,8 @@ import smplx
 import numpy as np
 
 # Path to the directory containing SMPLX_MALE.npz, SMPLX_FEMALE.npz, SMPLX_NEUTRAL.npz
-MODEL_DIR = Path(__file__).resolve().parents[2] / "models" / "smplx"
-OUTPUT_DIR = Path(__file__).resolve().parents[2] / "output"
+MODEL_DIR = Path(os.environ.get("SMPLX_MODEL_DIR", "models/smplx"))
+OUTPUT_DIR = Path(os.environ.get("SMPLX_OUTPUT_DIR", "output"))
 
 # Gender → model file basename expected by the smplx library
 GENDER_MAP = {
