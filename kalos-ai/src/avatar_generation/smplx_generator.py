@@ -89,6 +89,7 @@ class SMPLXGenerator:
         mesh: trimesh.Trimesh,
         filename: str = "avatar",
         export_format: str = "obj",
+        output_dir: Optional[str] = None,
     ) -> str:
         """
         Export a trimesh to disk as .obj or .gltf.
@@ -101,7 +102,8 @@ class SMPLXGenerator:
         Returns:
             Absolute path to the exported file.
         """
-        OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        out_dir = Path(output_dir) if output_dir else OUTPUT_DIR
+        out_dir.mkdir(parents=True, exist_ok=True)
 
         fmt = export_format.lower()
         if fmt not in ("obj", "gltf"):
