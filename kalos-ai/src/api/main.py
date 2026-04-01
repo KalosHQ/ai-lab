@@ -16,8 +16,8 @@ from fastapi.middleware.cors import CORSMiddleware
 # Ensure src/ is on the import path so sibling packages resolve
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from avatar.smplx_generator import SMPLXGenerator
-from api.routes.avatar import router as avatar_router
+from avatar_generation.smplx_generator import SMPLXGenerator
+from api.routes.avatar_generation_endpoint import router as avatar_router
 
 # Shared generator instance — populated at startup
 generator: Optional[SMPLXGenerator] = None
