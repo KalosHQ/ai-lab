@@ -10,8 +10,8 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 
-from ...avatar_generation.schema import AvatarRequest, AvatarResponse
-from ...avatar_generation.avatar_pipeline import generate_avatar as generate_avatar_pipeline
+from avatar_generation.schema import AvatarRequest, AvatarResponse
+from avatar_generation.avatar_pipeline import generate_avatar as generate_avatar_pipeline
 
 router = APIRouter(prefix="/api/ai", tags=["avatar"])
 
