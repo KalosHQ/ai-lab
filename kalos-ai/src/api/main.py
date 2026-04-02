@@ -13,11 +13,11 @@ from typing import Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Ensure src/ is on the import path so sibling packages resolve
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 
 from avatar_generation.smplx_generator import SMPLXGenerator
 from api.routes.avatar_generation_endpoint import router as avatar_router
+from utils.download_models import download_models
 
 # Shared generator instance — populated at startup
 generator: Optional[SMPLXGenerator] = None
@@ -28,6 +28,7 @@ async def lifespan(app: FastAPI):
     """Pre-load SMPL-X models into memory on startup."""
     global generator
     try:
+        download_models()
         generator = SMPLXGenerator()
         # Warm the cache for all three genders
         for g in ("neutral", "male", "female"):
