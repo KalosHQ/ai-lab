@@ -15,9 +15,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 
 
-from avatar_generation.smplx_generator import SMPLXGenerator
-from api.routes.avatar_generation_endpoint import router as avatar_router
-from utils.download_models import download_models
+from src.avatar_generation.smplx_generator import SMPLXGenerator
+from src.api.routes.avatar_generation_endpoint import router as avatar_router
+from src.utils.download_models import download_models
 
 # Shared generator instance — populated at startup
 generator: Optional[SMPLXGenerator] = None
@@ -28,14 +28,24 @@ async def lifespan(app: FastAPI):
     """Pre-load SMPL-X models into memory on startup."""
     global generator
     try:
-        download_models()
-        generator = SMPLXGenerator()
-        # Warm the cache for all three genders
-        for g in ("neutral", "male", "female"):
-            generator._get_model(g)
-        print("✅ SMPL-X models loaded successfully.")
+        models_available = download_models()
+        if not models_available:
+            print("⚠️  Some SMPL-X models could not be downloaded.")
+            print("   The avatar endpoint will return 503 until models are available.")
+            print("   Manually download models from: https://smpl-x.is.tue.mpg.de/")
+            print("   Place .npz files in: models/smplx/")
+            generator = None
+        else:
+            generator = SMPLXGenerator()
+            # Warm the cache for all three genders
+            for g in ("neutral", "male", "female"):
+                generator._get_model(g)
+            print("✅ SMPL-X models loaded successfully.")
     except FileNotFoundError as e:
         print(f"⚠️  SMPL-X models not found — avatar endpoint will return 503.\n{e}")
+        generator = None
+    except Exception as e:
+        print(f"⚠️  Unexpected error during startup: {e}")
         generator = None
     yield
     # Cleanup (nothing to do for now)

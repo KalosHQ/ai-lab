@@ -6,8 +6,8 @@ Single entry point for the backend to generate a 3D avatar from user measurement
 from pathlib import Path
 from typing import Optional
 
-from body_mapper import map_to_betas
-from smplx_generator import SMPLXGenerator
+from src.avatar_generation.body_mapper import map_to_betas
+from src.avatar_generation.smplx_generator import SMPLXGenerator
 
 
 def generate_avatar(
