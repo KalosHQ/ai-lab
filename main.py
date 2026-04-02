@@ -13,8 +13,8 @@ from typing import Optional
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Add src to the import path
-sys.path.insert(0, str(Path(__file__).resolve().parent / 'kalos-ai'))
+# Add the parent of src to the import path
+sys.path.insert(0, str(Path(__file__).resolve().parent / 'kalos_ai'))
 
 from kalos_ai.src.avatar_generation.smplx_generator import SMPLXGenerator
 from kalos_ai.src.api.routes.avatar_generation_endpoint import router as avatar_router
