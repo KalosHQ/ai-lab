@@ -18,8 +18,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the application code
 COPY . .
 
-# Create directories for models and output
-RUN mkdir -p models/smplx output
+# Bake SMPL-X models into Docker image
+COPY kalos_ai/models/smplx/ /app/models/smplx/
+RUN mkdir -p output
 
 # Set environment variables
 ENV PYTHONPATH=/app
