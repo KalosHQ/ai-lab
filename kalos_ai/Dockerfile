@@ -12,14 +12,17 @@ RUN apt-get update && apt-get install -y \
 # Copy requirements first for better caching
 COPY requirements.txt .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Install torch and torchvision separately (CPU only, much smaller)
+RUN pip install --no-cache-dir --timeout=300 \
+    torch torchvision --index-url https://download.pytorch.org/whl/cpu
+
+# Install remaining dependencies
+RUN pip install --no-cache-dir --timeout=300 -r requirements.txt
 
 # Copy the application code
 COPY . .
 
-# Bake SMPL-X models into Docker image
-COPY kalos_ai/models/smplx/ /app/models/smplx/
+# Create output directory
 RUN mkdir -p output
 
 # Set environment variables

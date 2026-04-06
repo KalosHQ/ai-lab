@@ -1,5 +1,3 @@
-torch
-torchvision
 smplx
 fastapi
 uvicorn[standard]
