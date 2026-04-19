@@ -25,6 +25,33 @@ GENDER_MAP = {
     "neutral": "neutral",
 }
 
+def _create_a_pose():
+    """Create A-pose parameters (arms down at ~20 degrees)."""
+    pose = np.zeros(63, dtype=np.float32)
+    # Shoulder joints are at indices 6-8 (left) and 9-11 (right)
+    # Rotate shoulders downward (positive X rotation)
+    pose[6:9] = [0.35, 0.0, 0.0]   # Left shoulder: 20° down
+    pose[9:12] = [0.35, 0.0, 0.0]  # Right shoulder: 20° down
+    return pose
+
+def _create_natural_pose():
+    """Create natural standing pose (slight elbow bend)."""
+    pose = np.zeros(63, dtype=np.float32)
+    # Shoulders down
+    pose[6:9] = [0.4, 0.0, 0.0]    # Left shoulder
+    pose[9:12] = [0.4, 0.0, 0.0]   # Right shoulder
+    # Slight elbow bend
+    pose[12:15] = [0.1, 0.0, 0.0]  # Left elbow
+    pose[15:18] = [0.1, 0.0, 0.0]  # Right elbow
+    return pose
+
+# SMPL-X pose presets (defined after helper functions)
+POSE_PRESETS = {
+    "t-pose": np.zeros(63, dtype=np.float32),  # Default T-pose
+    "a-pose": _create_a_pose(),
+    "natural": _create_natural_pose(),
+}
+
 
 class SMPLXGenerator:
     """Manages SMPL-X model instances and generates 3D body meshes."""
@@ -63,6 +90,7 @@ class SMPLXGenerator:
         self,
         betas: torch.Tensor,
         gender: str = "neutral",
+        pose: str = "a-pose",
     ) -> trimesh.Trimesh:
         """
         Run SMPL-X forward pass and return a trimesh.Trimesh.
@@ -77,7 +105,14 @@ class SMPLXGenerator:
         num_betas = betas.shape[-1]
         model = self._get_model(gender, num_betas)
 
-        output = model(betas=betas.to(self.device))
+        body_pose = POSE_PRESETS.get(pose, POSE_PRESETS["a-pose"])
+        body_pose_tensor = torch.tensor(
+            body_pose, dtype=torch.float32, device=self.device).unsqueeze(0)
+
+        output = model(
+            betas=betas.to(self.device),
+            body_pose=body_pose_tensor
+        )
         vertices = output.vertices.squeeze(0).cpu().numpy()
         faces = model.faces.astype(np.int32)
 

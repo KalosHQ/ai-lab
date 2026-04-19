@@ -13,6 +13,18 @@ class BodyType(str, Enum):
     plus = "plus"
 
 
+class ClothingSize(str, Enum):
+    """Standard clothing size options for better body shape estimation."""
+    XXS = "XXS"
+    XS = "XS"
+    S = "S"
+    M = "M"
+    L = "L"
+    XL = "XL"
+    XXL = "XXL"
+    XXXL = "XXXL"
+
+
 class Gender(str, Enum):
     male = "male"
     female = "female"
@@ -24,12 +36,20 @@ class ExportFormat(str, Enum):
     gltf = "gltf"
 
 
+class Pose(str, Enum):
+    t_pose = "t-pose"
+    a_pose = "a-pose"
+    natural = "natural"
+
+
 class AvatarRequest(BaseModel):
     height_cm: float = Field(..., gt=100, lt=250, description="Height in centimeters")
     weight_kg: float = Field(..., gt=30, lt=300, description="Weight in kilograms")
+    clothing_size: Optional[ClothingSize] = Field(None, description="Clothing size for better body shape estimation (XS-3XL)")
     body_type: BodyType = Field(default=BodyType.average, description="Body type preset")
     gender: Gender = Field(default=Gender.neutral, description="Gender for model selection")
     export_format: ExportFormat = Field(default=ExportFormat.obj, description="3D file format")
+    pose: Pose = Field(default=Pose.a_pose, description="Body pose preset")
 
 
 class AvatarResponse(BaseModel):

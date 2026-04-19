@@ -23,6 +23,9 @@ async def generate_avatar(req: AvatarRequest):
     filename = f"avatar_{uuid.uuid4().hex[:8]}"
     
     try:
+        # Extract clothing_size if provided (convert enum to string)
+        clothing_size = req.clothing_size.value if req.clothing_size else None
+        
         # Call the pipeline function
         out_path = generate_avatar_pipeline(
             height_cm=req.height_cm,
@@ -31,8 +34,10 @@ async def generate_avatar(req: AvatarRequest):
             gender=req.gender.value,
             model_dir="models/smplx",
             output_dir="output",
+            clothing_size=clothing_size,
             filename=filename,
-            export_format=req.export_format.value
+            export_format=req.export_format.value,
+            pose=req.pose.value
         )
     except FileNotFoundError as e:
         raise HTTPException(
